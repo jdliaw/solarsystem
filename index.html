@@ -1,0 +1,37 @@
+<!DOCTYPE HTML>
+<html>
+
+<script id="vertex-shader" type="x-shader/x-vertex">
+  attribute vec4 vPosition;
+
+  uniform mat4 model_transform;
+  uniform mat4 camera_transform;
+  uniform mat4 projection_transform;
+
+  void main() {
+    gl_Position = projection_transform * camera_transform * model_transform * vPosition;
+    gl_Position.z = -gl_Position.z;
+  }
+</script>
+
+<script id="fragment-shader" type="x-shader/x-fragment">
+  precision mediump float;
+  uniform vec4 vColor;
+
+  void main() {
+    gl_FragColor = vColor;
+  }
+</script>
+
+<script type="text/javascript" src="webgl-utils.js"></script>
+<script type="text/javascript" src="initShaders.js"></script>
+<script type="text/javascript" src="MV.js"></script>
+<script type="text/javascript" src="index.js"></script>
+
+<body>
+  <canvas id="gl-canvas" width="960" height="960">
+    Your browser doesn't support HTML5 canvas.
+  </canvas>
+</body>
+
+</html>
