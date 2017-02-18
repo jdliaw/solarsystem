@@ -1,68 +1,26 @@
-//////////////////////////////////////////////////////////////////////////////
-//
-//  Angel.js
-//
-//////////////////////////////////////////////////////////////////////////////
-
+// UCLA's Graphics Example Code (Javascript and C++ translations available), by Garett Ridge for CS174a.
+// MV.js - The textbook author's example Matrix / Vector math library for Javascript projects.  I added and fixed things.
 //----------------------------------------------------------------------------
 //
 //  Helper functions
 //
 
-function _argumentsToArray( args )
-{
-    return [].concat.apply( [], Array.prototype.slice.apply(args) );
-}
+function _argumentsToArray( args )  { return [].concat.apply( [], Array.prototype.slice.apply(args) ); }
 
 //----------------------------------------------------------------------------
 
-function radians( degrees ) {
-    return degrees * Math.PI / 180.0;
-}
+function radians( degrees ) { return degrees * Math.PI / 180.0; }
 
 //----------------------------------------------------------------------------
 //
 //  Vector Constructors
 //
 
-function vec2()
-{
-    var result = _argumentsToArray( arguments );
+function vec2( x = 0, y = 0 )               {  return [ x, y       ];  }
 
-    switch ( result.length ) {
-    case 0: result.push( 0.0 );
-    case 1: result.push( 0.0 );
-    }
+function vec3( x = 0, y = 0, z = 0 )        {  return [ x, y, z    ];  }
 
-    return result.splice( 0, 2 );
-}
-
-function vec3()
-{
-    var result = _argumentsToArray( arguments );
-
-    switch ( result.length ) {
-    case 0: result.push( 0.0 );
-    case 1: result.push( 0.0 );
-    case 2: result.push( 0.0 );
-    }
-
-    return result.splice( 0, 3 );
-}
-
-function vec4()
-{
-    var result = _argumentsToArray( arguments );
-
-    switch ( result.length ) {
-    case 0: result.push( 0.0 );
-    case 1: result.push( 0.0 );
-    case 2: result.push( 0.0 );
-    case 3: result.push( 1.0 );
-    }
-
-    return result.splice( 0, 4 );
-}
+function vec4( x = 0, y = 0, z = 0, w = 1 ) {  return [ x, y, z, w ]; }
 
 //----------------------------------------------------------------------------
 //
@@ -114,9 +72,9 @@ function mat3()
         break;
 
     default:
-        m.push( vec3(v) );  v.splice( 0, 3 );
-        m.push( vec3(v) );  v.splice( 0, 3 );
-        m.push( vec3(v) );
+        m.push( v.splice( 0, 3 ) );
+        m.push( v.splice( 0, 3 ) );
+        m.push( v.splice( 0, 3 ) );
         break;
     }
 
@@ -145,10 +103,10 @@ function mat4()
         break;
 
     default:
-        m.push( vec4(v) );  v.splice( 0, 4 );
-        m.push( vec4(v) );  v.splice( 0, 4 );
-        m.push( vec4(v) );  v.splice( 0, 4 );
-        m.push( vec4(v) );
+        m.push( v.splice( 0, 4 ) );
+        m.push( v.splice( 0, 4 ) );
+        m.push( v.splice( 0, 4 ) );
+        m.push( v.splice( 0, 4 ) );
         break;
     }
 
@@ -321,7 +279,7 @@ function mult( u, v )
 //  Basic Transformation Matrix Generators
 //
 
-function translate( x, y, z )
+function translation( x, y, z )
 {
     if ( Array.isArray(x) && x.length == 3 ) {
         z = x[2];
@@ -339,13 +297,13 @@ function translate( x, y, z )
 
 //----------------------------------------------------------------------------
 
-function rotate( angle, axis )
+function rotation( angle, axis )
 {
     if ( !Array.isArray(axis) ) {
         axis = [ arguments[1], arguments[2], arguments[3] ];
     }
 
-    var v = normalize( axis );
+    var v = normalize( axis.slice() );
 
     var x = v[0];
     var y = v[1];
@@ -408,14 +366,16 @@ function lookAt( eye, at, up )
 
     var v = normalize( subtract(at, eye) );  // view direction vector
     var n = normalize( cross(v, up) );       // perpendicular vector
+    if( n[0] != n[0] )    
+      throw "lookAt(): two parallel vectors were given";
     var u = normalize( cross(n, v) );        // "new" up vector
 
     v = negate( v );
 
     var result = mat4(
-        vec4( n, -dot(n, eye) ),
-        vec4( u, -dot(u, eye) ),
-        vec4( v, -dot(v, eye) ),
+        n.concat( -dot(n, eye) ),
+        u.concat( -dot(u, eye) ),
+        v.concat( -dot(v, eye) ),
         vec4()
     );
 
@@ -513,7 +473,7 @@ function dot( u, v )
 
 function negate( u )
 {
-    result = [];
+    var result = [];
     for ( var i = 0; i < u.length; ++i ) {
         result.push( -u[i] );
     }
@@ -544,7 +504,7 @@ function cross( u, v )
 
 //----------------------------------------------------------------------------
 
-function length1( u )
+function length( u )
 {
     return Math.sqrt( dot(u, u) );
 }
@@ -557,7 +517,7 @@ function normalize( u, excludeLastComponent )
         var last = u.pop();
     }
     
-    var len = length1( u );
+    var len = length( u );
 
     if ( !isFinite(len) ) {
         throw "normalize: vector " + u + " has zero length";
@@ -588,7 +548,7 @@ function mix( u, v, s )
 
     var result = [];
     for ( var i = 0; i < u.length; ++i ) {
-        result.push( s * u[i] + (1.0 - s) * v[i] );
+        result.push( (1.0 - s) * u[i] +  s * v[i] );
     }
 
     return result;
@@ -599,13 +559,13 @@ function mix( u, v, s )
 // Vector and Matrix functions
 //
 
-function scale1( s, u )
+function scale_vec( s, u )
 {
     if ( !Array.isArray(u) ) {
         throw "scale: second parameter " + u + " is not a vector";
     }
 
-    result = [];
+    var result = [];
     for ( var i = 0; i < u.length; ++i ) {
         result.push( s * u[i] );
     }
@@ -661,3 +621,67 @@ var sizeof = {
     'mat3' : new Float32Array( flatten(mat3()) ).byteLength,
     'mat4' : new Float32Array( flatten(mat4()) ).byteLength
 };
+
+function inverse( m ) 
+{
+  if ( !m.matrix )  { throw "attempt to invert non matrix"; }
+  
+  var result = mat4();
+  var n11 = m[ 0 ][ 0 ], n12 = m[ 0 ][ 1 ], n13 = m[ 0 ][ 2 ], n14 = m[ 0 ][ 3 ]
+  var n21 = m[ 1 ][ 0 ], n22 = m[ 1 ][ 1 ], n23 = m[ 1 ][ 2 ], n24 = m[ 1 ][ 3 ];
+  var n31 = m[ 2 ][ 0 ], n32 = m[ 2 ][ 1 ], n33 = m[ 2 ][ 2 ], n34 = m[ 2 ][ 3 ];
+  var n41 = m[ 3 ][ 0 ], n42 = m[ 3 ][ 1 ], n43 = m[ 3 ][ 2 ], n44 = m[ 3 ][ 3 ];
+
+  result[ 0 ][ 0 ] = n23 * n34 * n42 - n24 * n33 * n42 + n24 * n32 * n43 - n22 * n34 * n43 - n23 * n32 * n44 + n22 * n33 * n44;
+  result[ 0 ][ 1 ] = n14 * n33 * n42 - n13 * n34 * n42 - n14 * n32 * n43 + n12 * n34 * n43 + n13 * n32 * n44 - n12 * n33 * n44;
+  result[ 0 ][ 2 ] = n13 * n24 * n42 - n14 * n23 * n42 + n14 * n22 * n43 - n12 * n24 * n43 - n13 * n22 * n44 + n12 * n23 * n44;
+  result[ 0 ][ 3 ] = n14 * n23 * n32 - n13 * n24 * n32 - n14 * n22 * n33 + n12 * n24 * n33 + n13 * n22 * n34 - n12 * n23 * n34;
+  result[ 1 ][ 0 ] = n24 * n33 * n41 - n23 * n34 * n41 - n24 * n31 * n43 + n21 * n34 * n43 + n23 * n31 * n44 - n21 * n33 * n44;
+  result[ 1 ][ 1 ] = n13 * n34 * n41 - n14 * n33 * n41 + n14 * n31 * n43 - n11 * n34 * n43 - n13 * n31 * n44 + n11 * n33 * n44;
+  result[ 1 ][ 2 ] = n14 * n23 * n41 - n13 * n24 * n41 - n14 * n21 * n43 + n11 * n24 * n43 + n13 * n21 * n44 - n11 * n23 * n44;
+  result[ 1 ][ 3 ] = n13 * n24 * n31 - n14 * n23 * n31 + n14 * n21 * n33 - n11 * n24 * n33 - n13 * n21 * n34 + n11 * n23 * n34;
+  result[ 2 ][ 0 ] = n22 * n34 * n41 - n24 * n32 * n41 + n24 * n31 * n42 - n21 * n34 * n42 - n22 * n31 * n44 + n21 * n32 * n44;
+  result[ 2 ][ 1 ] = n14 * n32 * n41 - n12 * n34 * n41 - n14 * n31 * n42 + n11 * n34 * n42 + n12 * n31 * n44 - n11 * n32 * n44;
+  result[ 2 ][ 2 ] = n12 * n24 * n41 - n14 * n22 * n41 + n14 * n21 * n42 - n11 * n24 * n42 - n12 * n21 * n44 + n11 * n22 * n44;
+  result[ 2 ][ 3 ] = n14 * n22 * n31 - n12 * n24 * n31 - n14 * n21 * n32 + n11 * n24 * n32 + n12 * n21 * n34 - n11 * n22 * n34;
+  result[ 3 ][ 0 ] = n23 * n32 * n41 - n22 * n33 * n41 - n23 * n31 * n42 + n21 * n33 * n42 + n22 * n31 * n43 - n21 * n32 * n43;
+  result[ 3 ][ 1 ] = n12 * n33 * n41 - n13 * n32 * n41 + n13 * n31 * n42 - n11 * n33 * n42 - n12 * n31 * n43 + n11 * n32 * n43;
+  result[ 3 ][ 2 ] = n13 * n22 * n41 - n12 * n23 * n41 - n13 * n21 * n42 + n11 * n23 * n42 + n12 * n21 * n43 - n11 * n22 * n43;
+  result[ 3 ][ 3 ] = n12 * n23 * n31 - n13 * n22 * n31 + n13 * n21 * n32 - n11 * n23 * n32 - n12 * n21 * n33 + n11 * n22 * n33;
+
+  var one_over_determinant = 1.0 / (n11 * result[ 0 ][ 0 ] + n21 * result[ 0 ][ 1 ] + n31 * result[ 0 ][ 2 ] + n41 * result[ 0 ][ 3 ] );
+
+  return mult (result, mat4( one_over_determinant ) );
+}
+
+  
+function mult_vec( M, v )
+  {
+    v_4 = v.length == 4 ? v : vec4( v, 0 );
+    v_new = vec4();
+    v_new[0] = dot( M[0], v_4 );
+    v_new[1] = dot( M[1], v_4 );
+    v_new[2] = dot( M[2], v_4 );
+    v_new[3] = dot( M[3], v_4 );
+    return v_new;
+  }
+
+function toMat3( mat4_affine )    // Slice off the 4th row and column of a matrix
+	{
+		var m = [];
+		m.push( mat4_affine[0].slice( 0, 3 ) );
+		m.push( mat4_affine[1].slice( 0, 3 ) );
+		m.push( mat4_affine[2].slice( 0, 3 ) );
+		m.matrix = true;
+		return m;
+	}
+  
+function hermite_curve_point( a, b, da, db, t, epsilon = .0001 )      // Static function to generate one intermediate point (anywhere) along a curve you supply, based on 
+    {                                                                 // parameter t.  To specify the curve's location, supply endpoints a and b and tangents da and db. 
+      var curveMatrix = [b, a, db, da]; curveMatrix.matrix = true;    // The return value is not a position but an object, containing a position and a normal vector.
+      var hermiteMatrix = mat4( -2, 3, 0, 0,   2, -3, 0, 1,   1, -1, 0, 0,   1, -2, 1, 0 ),  t_next = t + epsilon,
+      point1 = mult_vec( mult( transpose( curveMatrix ), hermiteMatrix ), vec4( t*t*t,                t*t,           t,      1 ) ), //Apply the hermite polynomial at time t to generate a point
+      point2 = mult_vec( mult( transpose( curveMatrix ), hermiteMatrix ), vec4( t_next*t_next*t_next, t_next*t_next, t_next, 1 ) ); //Also generate another point slightly ahead of that
+      return { position: vec3( point1 ), normal: vec3( subtract( point2, point1 ) ) };
+    }
+	

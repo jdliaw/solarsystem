@@ -39,6 +39,65 @@ Declare_Any_Class( "Square",    // A square, demonstrating shared vertices.  On 
       }
   }, Shape )
 
+// SPHERE
+Declare_Any_Class( "Sphere",
+  {'populate': function (num_bands, radius, using_flat_shading)
+    {
+      var this_shape = this;
+      var numIndices = 0;
+
+      function sphere(num_bands, radius, using_flat_shading) {
+        var latitudeBands = num_bands;
+        var longitudeBands = num_bands;
+
+        for (var latNumber = 0; latNumber <= latitudeBands; latNumber++) {
+          //calculate the horizontal bands
+          var theta = latNumber * Math.PI / latitudeBands;
+          var sinTheta = Math.sin(theta);
+          var cosTheta = Math.cos(theta);
+
+          //calculate the vertical slices
+          for (var longNumber = 0; longNumber <= longitudeBands; longNumber++) {
+            var phi = longNumber * 2 * Math.PI / longitudeBands;
+            var sinPhi = Math.sin(phi);
+            var cosPhi = Math.cos(phi);
+            //intersection points
+            var x = cosPhi * sinTheta;
+            var y = cosTheta;
+            var z = sinPhi * sinTheta;
+            var u = 1 - (longNumber / longitudeBands);
+            var v = latNumber / latitudeBands;
+
+            var loc = vec3(radius * x, radius * y, radius * z)
+            this_shape.positions.push(loc);
+
+            //map images.
+            this_shape.texture_coords.push(vec2(-u, -v));
+            this_shape.normals.push(vec3(x, y, z));
+
+          }
+        }
+
+        // two triangles create a square.
+        for (var latNumber = 0; latNumber < latitudeBands; latNumber++) {
+          for (var longNumber = 0; longNumber < longitudeBands; longNumber++) {
+            var first = (latNumber * (longitudeBands + 1)) + longNumber;
+            var second = first + longitudeBands + 1;
+            this_shape.indices.push(first);
+            this_shape.indices.push(second);
+            this_shape.indices.push(first + 1);
+
+            this_shape.indices.push(second);
+            this_shape.indices.push(second + 1);
+            this_shape.indices.push(first + 1);
+          }
+        }
+      }
+      sphere(num_bands, radius, using_flat_shading);
+    }
+
+  }, Shape)
+
 // *********** TETRAHEDRON ***********
 Declare_Any_Class( "Tetrahedron",              // A demo of flat vs smooth shading.  Also our first 3D, non-planar shape.
   { 'populate': function( using_flat_shading ) // Takes a boolean argument
