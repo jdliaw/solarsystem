@@ -295,7 +295,7 @@ Declare_Any_Class( "Example_Animation",  // An example of a displayable object t
         model_transform = stack.pop();
 
         stack.push(model_transform);
-        model_transform = mult(model_transform, rotation(.2 * graphics_state.animation_time, 0, 1, 0))
+        model_transform = mult(model_transform, rotation(.21 * graphics_state.animation_time, 0, 1, 0))
         model_transform = mult(model_transform, translation( -23, 0, 0));
         shapes_in_use.planet4.draw(graphics_state, model_transform, muddy);
         model_transform = stack.pop();

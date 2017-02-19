@@ -25,14 +25,38 @@
     (3) Function for sphere geometry
     (4) Generate normal functions in sphere function
     (5) Create a small solar system
+    (6) Point light source at sun location
+    (7) Flat shading for planet 1
+    (8) Gourad shading for planet 2
+    (9) Phong shading for planet 3
+    (10) Phong shading for planet 4
+    (11) Moon orbiting around a planet
+    (12) Implement vertex and fragment shading
+    (13) Keyboard navigation UDLR, R, Space, number keys
+    (14) Allow camera to attach/detach from a planet
 
-    (6) Up and down keys control position of camera along y-axis
-    (7) Left and right keys control the heading of the camera azimuth
-    (8) 'ijkm' keys move forward, left, right, and backward respectively relative to the camera's current heading. 'r' key resets the view to the start position
-    (9) 'n' and 'w' keys narrow/widen the field of view
-    (10) '+' key toggles the display of a crosshair in white
+#### Planet stats
+    Sun
+      Radius: 15
+      Color:
+    Planet 1
+      Radius: 6
+      Color: Blue green
+      Speed: .1
+    Planet 2
+      Radius: 8
+      Color: Icy gray
+      Speed: .13
+    Planet 3
+      Radius: 15
+      Color: Clear blue
+      Speed: .05
+    Planet 4
+      Radius: 8
+      Color: Muddy orange
+      Speed: .21
+    Moon
+      Radius: 14
+      Color: Light gray
+      Speed: .2
 
-#### Extra Credit
-    (1) Instance each of the cubes from the same geometry data
-    (2) Implement the cube as a single triangle strip primitive
-    (3) Continuously rotate and scale each of the cubes while the application is running.
