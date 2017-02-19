@@ -1,5 +1,5 @@
 // UCLA's Graphics Example Code (Javascript and C++ translations available), by Garett Ridge for CS174a.
-// example_shapes.js is where you can define a number of objects that inherit from class Shape.  All Shapes have certain arrays.  These each manage either
+// example_shapes.js is where you can define a Num of objects that inherit from class Shape.  All Shapes have certain arrays.  These each manage either
 // the shape's 3D vertex positions, 3D vertex normal vectors, 2D texture coordinates, or any other per-vertex quantity.  All subclasses of Shape inherit
 // instantiation, any Shape subclass populates these lists in their own way, so we can use GL calls -- special kernel functions to copy each of the lists
 // one-to-one into new buffers in the graphics card's memory.
@@ -41,48 +41,46 @@ Declare_Any_Class( "Square",    // A square, demonstrating shared vertices.  On 
 
 // SPHERE
 Declare_Any_Class( "Sphere",
-  {'populate': function (num_bands, radius, using_flat_shading)
+  {'populate': function (bands, radius, using_flat_shading)
     {
+      var indices = 0;
       var this_shape = this;
-      var numIndices = 0;
 
-      function sphere(num_bands, radius, using_flat_shading) {
-        var latitudeBands = num_bands;
-        var longitudeBands = num_bands;
+      function sphere(bands, radius, using_flat_shading) {
+        var longBands = bands;
+        var latBands = bands;
 
-        for (var latNumber = 0; latNumber <= latitudeBands; latNumber++) {
+        for (var lat = 0; lat <= latBands; lat++) {
           //calculate the horizontal bands
-          var theta = latNumber * Math.PI / latitudeBands;
-          var sinTheta = Math.sin(theta);
+          var theta = lat * Math.PI / latBands;
           var cosTheta = Math.cos(theta);
+          var sinTheta = Math.sin(theta);
 
           //calculate the vertical slices
-          for (var longNumber = 0; longNumber <= longitudeBands; longNumber++) {
-            var phi = longNumber * 2 * Math.PI / longitudeBands;
-            var sinPhi = Math.sin(phi);
+          for (var long = 0; long <= longBands; long++) {
+            var phi = long * 2 * Math.PI / longBands;
             var cosPhi = Math.cos(phi);
+            var sinPhi = Math.sin(phi);
             //intersection points
             var x = cosPhi * sinTheta;
             var y = cosTheta;
             var z = sinPhi * sinTheta;
-            var u = 1 - (longNumber / longitudeBands);
-            var v = latNumber / latitudeBands;
+            var u = 1 - (long / longBands);
+            var v = lat / latBands;
 
             var loc = vec3(radius * x, radius * y, radius * z)
             this_shape.positions.push(loc);
-
-            //map images.
+            //map images
             this_shape.texture_coords.push(vec2(-u, -v));
             this_shape.normals.push(vec3(x, y, z));
-
           }
         }
 
         // two triangles create a square
-        for (var latNumber = 0; latNumber < latitudeBands; latNumber++) {
-          for (var longNumber = 0; longNumber < longitudeBands; longNumber++) {
-            var first = (latNumber * (longitudeBands + 1)) + longNumber;
-            var second = first + longitudeBands + 1;
+        for (var lat = 0; lat < latBands; lat++) {
+          for (var long = 0; long < longBands; long++) {
+            var first = (lat * (longBands + 1)) + long;
+            var second = first + longBands + 1;
             this_shape.indices.push(first);
             this_shape.indices.push(second);
             this_shape.indices.push(first + 1);
@@ -93,7 +91,7 @@ Declare_Any_Class( "Sphere",
           }
         }
       }
-      sphere(num_bands, radius, using_flat_shading);
+      sphere(bands, radius, using_flat_shading);
     }
 
   }, Shape)
