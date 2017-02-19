@@ -72,6 +72,7 @@ Declare_Any_Class( "Example_Camera",     // An example of a displayable object t
     'init_keys': function( controls )   // init_keys():  Define any extra keyboard shortcuts here
       {
         // controls.add( "z",     this, function() { this.thrust[1] =  1; } );     controls.add( "z",     this, function() { this.thrust[1] =  0; }, {'type':'keyup'} );
+        // space = forward
         controls.add( "Space",     this, function() { this.thrust[2] =  N; } );
         controls.add( "Space",     this, function() { this.thrust[2] =  0; }, {'type':'keyup'} );
         // m = backwards
@@ -133,9 +134,14 @@ Declare_Any_Class( "Example_Camera",     // An example of a displayable object t
           }
         });
         // controls.add( "o",     this, function() { this.origin = mult_vec( inverse( this.graphics_state.camera_transform ), vec4(0,0,0,1) ).slice(0,3)         ; } );
+        // reset. make sure to reset the attach and rotations
         controls.add( "r",     this, function() {
           this.graphics_state.camera_transform = mat4();
           this.graphics_state.camera_transform = mult(translation(-7, -3, -60), this.graphics_state.camera_transform);
+          attach = false;
+          N = 1;
+          LR_rotation = 0;
+          UD_rotation = 0;
         });
         controls.add("1", this, function () { N = 1; });
         controls.add("2", this, function () { N = 2; });
@@ -189,6 +195,8 @@ Declare_Any_Class( "Example_Animation",  // An example of a displayable object t
         // shapes_in_use.bad_tetrahedron = new Tetrahedron( false );      // For example we'll only create one "cube" blueprint in the GPU, but we'll re-use
         // shapes_in_use.tetrahedron     = new Tetrahedron( true );      // it many times per call to display to get multiple cubes in the scene.
         // shapes_in_use.windmill        = new Windmill( 10 );
+
+        // define shapes
         shapes_in_use.sphere = new Sphere(4, 1, false);
         shapes_in_use.sun = new Sphere(15, 3, false);
         shapes_in_use.planet2 = new Sphere(6, 1, false);
@@ -247,10 +255,12 @@ Declare_Any_Class( "Example_Animation",  // An example of a displayable object t
 
         var stack = [];
 
+        // sun
         model_transform = mult( model_transform, translation( 10, 0, 0 ) );
         shapes_in_use.sun.draw( graphics_state, model_transform, yellow );
         stack.push(model_transform);
 
+        // planet1
         model_transform = mult(model_transform, rotation(.1 * graphics_state.animation_time, 0, 1, 0));
         model_transform = mult(model_transform, translation( -5, 0, 0 ));
         shapes_in_use.planet1.draw(graphics_state, model_transform, icygray);
@@ -262,6 +272,7 @@ Declare_Any_Class( "Example_Animation",  // An example of a displayable object t
         model_transform = mult(model_transform, translation( -9, 0, 0 ));
         shapes_in_use.planet2.draw(graphics_state, model_transform, bluegreen);
         this.shared_scratchpad.graphics_state.gouraud ^= 1;
+         // attach to planet 2
         if (attach) {
           model_transform = mult(model_transform, translation(-3, 0, 0));
           model_transform = mult(model_transform, rotation(270, 0, 1, 0));
@@ -272,6 +283,7 @@ Declare_Any_Class( "Example_Animation",  // An example of a displayable object t
         }
         model_transform = stack.pop();
 
+        // planet3 + moon
         stack.push(model_transform);
         model_transform = mult(model_transform, rotation(.05 * graphics_state.animation_time, 0, 1, 0))
         model_transform = mult(model_transform, translation( -15, 0, 0 ));

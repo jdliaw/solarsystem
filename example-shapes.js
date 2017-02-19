@@ -78,7 +78,7 @@ Declare_Any_Class( "Sphere",
           }
         }
 
-        // two triangles create a square.
+        // two triangles create a square
         for (var latNumber = 0; latNumber < latitudeBands; latNumber++) {
           for (var longNumber = 0; longNumber < longitudeBands; longNumber++) {
             var first = (latNumber * (longitudeBands + 1)) + longNumber;
