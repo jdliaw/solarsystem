@@ -186,22 +186,32 @@ Declare_Any_Class( "Example_Animation",  // An example of a displayable object t
         model_transform = stack.pop();
 
         stack.push(model_transform);
-        model_transform = mult(model_transform, rotation(.3 * graphics_state.animation_time, 0, 1, 0))
+        this.shared_scratchpad.graphics_state.gouraud ^= 1; // gourad shading
+        model_transform = mult(model_transform, rotation(.13 * graphics_state.animation_time, 0, 1, 0))
         model_transform = mult(model_transform, translation( -9, 0, 0 ));
         shapes_in_use.planet2.draw(graphics_state, model_transform, bluegreen);
-        model_transform = stack.pop();
-
-        stack.push(model_transform);
-        model_transform = mult(model_transform, rotation(.35 * graphics_state.animation_time, 0, 1, 0))
-        model_transform = mult(model_transform, translation( -15, 0, 0 ));
-        shapes_in_use.planet3.draw(graphics_state, model_transform, clearblue);
+        this.shared_scratchpad.graphics_state.gouraud ^= 1;
         model_transform = stack.pop();
 
         stack.push(model_transform);
         model_transform = mult(model_transform, rotation(.05 * graphics_state.animation_time, 0, 1, 0))
+        model_transform = mult(model_transform, translation( -15, 0, 0 ));
+        shapes_in_use.planet3.draw(graphics_state, model_transform, clearblue);
+        // model_transform = stack.pop();
+
+        // stack.push(model_transform);
+        model_transform = mult(model_transform, rotation(.2 * graphics_state.animation_time, 0, 1, 0))
+        model_transform = mult(model_transform, translation( -3, 0, 0));
+        shapes_in_use.moon.draw(graphics_state, model_transform, moon);
+        model_transform = stack.pop();
+
+        stack.push(model_transform);
+        model_transform = mult(model_transform, rotation(.2 * graphics_state.animation_time, 0, 1, 0))
         model_transform = mult(model_transform, translation( -23, 0, 0));
         shapes_in_use.planet4.draw(graphics_state, model_transform, muddy);
         model_transform = stack.pop();
+
+
 
       }
   }, Animation );
