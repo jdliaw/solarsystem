@@ -2,7 +2,7 @@
 
 ### Jennifer Liaw 004454638
 
-#### Please grade the version tagged v1.0
+#### Please grade the version tagged v1.1
     Controls:
       R - reset
       UP - rotating heading up by N degrees
