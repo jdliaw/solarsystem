@@ -112,18 +112,24 @@ Declare_Any_Class( "Example_Animation",  // An example of a displayable object t
   { 'construct': function( context )
       { this.shared_scratchpad    = context.shared_scratchpad;
 
-        shapes_in_use.triangle        = new Triangle();                  // At the beginning of our program, instantiate all shapes we plan to use,
-        shapes_in_use.strip           = new Square();                   // each with only one instance in the graphics card's memory.
-        shapes_in_use.bad_tetrahedron = new Tetrahedron( false );      // For example we'll only create one "cube" blueprint in the GPU, but we'll re-use
-        shapes_in_use.tetrahedron     = new Tetrahedron( true );      // it many times per call to display to get multiple cubes in the scene.
-        shapes_in_use.windmill        = new Windmill( 10 );
-        shapes_in_use.sphere          = new Sphere(4, 1, false);
+        // shapes_in_use.triangle        = new Triangle();                  // At the beginning of our program, instantiate all shapes we plan to use,
+        // shapes_in_use.strip           = new Square();                   // each with only one instance in the graphics card's memory.
+        // shapes_in_use.bad_tetrahedron = new Tetrahedron( false );      // For example we'll only create one "cube" blueprint in the GPU, but we'll re-use
+        // shapes_in_use.tetrahedron     = new Tetrahedron( true );      // it many times per call to display to get multiple cubes in the scene.
+        // shapes_in_use.windmill        = new Windmill( 10 );
+        shapes_in_use.sphere = new Sphere(4, 1, false);
+        shapes_in_use.sun = new Sphere(15, 3, false);
+        shapes_in_use.planet2 = new Sphere(6, 1, false);
+        shapes_in_use.planet3 = new Sphere(15, 1.4, false);
+        shapes_in_use.planet4 = new Sphere(8, 1.7, false);
+        shapes_in_use.moon = new Sphere(14, .5, false);
+        shapes_in_use.planet1 = Sphere.prototype.auto_flat_shaded_version(5, .8, false);
 
-        shapes_in_use.triangle_flat        = Triangle.prototype.auto_flat_shaded_version();
-        shapes_in_use.strip_flat           = Square.prototype.auto_flat_shaded_version();
-        shapes_in_use.bad_tetrahedron_flat = Tetrahedron.prototype.auto_flat_shaded_version( false );
-        shapes_in_use.tetrahedron_flat          = Tetrahedron.prototype.auto_flat_shaded_version( true );
-        shapes_in_use.windmill_flat             = Windmill.prototype.auto_flat_shaded_version( 10 );
+        // shapes_in_use.triangle_flat        = Triangle.prototype.auto_flat_shaded_version();
+        // shapes_in_use.strip_flat           = Square.prototype.auto_flat_shaded_version();
+        // shapes_in_use.bad_tetrahedron_flat = Tetrahedron.prototype.auto_flat_shaded_version( false );
+        // shapes_in_use.tetrahedron_flat          = Tetrahedron.prototype.auto_flat_shaded_version( true );
+        // shapes_in_use.windmill_flat             = Windmill.prototype.auto_flat_shaded_version( 10 );
       },
     'init_keys': function( controls )   // init_keys():  Define any extra keyboard shortcuts here
       {
@@ -147,8 +153,9 @@ Declare_Any_Class( "Example_Animation",  // An example of a displayable object t
         graphics_state.lights = [];                    // First clear the light list each frame so we can replace & update lights.
 
         var t = graphics_state.animation_time/1000, light_orbit = [ Math.cos(t), Math.sin(t) ];
-        graphics_state.lights.push( new Light( vec4(  30*light_orbit[0],  30*light_orbit[1],  34*light_orbit[0], 1 ), Color( 0, .4, 0, 1 ), 100000 ) );
-        graphics_state.lights.push( new Light( vec4( -10*light_orbit[0], -20*light_orbit[1], -14*light_orbit[0], 0 ), Color( 1, 1, .3, 1 ), 100*Math.cos( t/10 ) ) );
+        graphics_state.lights.push( new Light( vec4(10, 0, 0, 1), Color(1, 0, 0, 0), 10000 ));
+        // graphics_state.lights.push( new Light( vec4(  30*light_orbit[0],  30*light_orbit[1],  34*light_orbit[0], 1 ), Color( 0, .4, 0, 1 ), 100000 ) );
+        // graphics_state.lights.push( new Light( vec4( -10*light_orbit[0], -20*light_orbit[1], -14*light_orbit[0], 0 ), Color( 1, 1, .3, 1 ), 100*Math.cos( t/10 ) ) );
 
         // *** Materials: *** Declare new ones as temps when needed; they're just cheap wrappers for some numbers.
         // 1st parameter:  Color (4 floats in RGBA format), 2nd: Ambient light, 3rd: Diffuse reflectivity, 4th: Specular reflectivity, 5th: Smoothness exponent, 6th: Texture image.
@@ -160,9 +167,30 @@ Declare_Any_Class( "Example_Animation",  // An example of a displayable object t
         Start coding down here!!!!
         **********************************/                                     // From here on down it's just some example shapes drawn for you -- replace them with your own!
 
-        model_transform = mult( model_transform, translation( 0, 5, 0 ) );
-        shapes_in_use.sphere       .draw( graphics_state, model_transform, purplePlastic );
+        var stack = [];
 
+        model_transform = mult( model_transform, translation( 10, 0, 0 ) );
+        shapes_in_use.sun.draw( graphics_state, model_transform, purplePlastic );
+        stack.push(model_transform);
+
+        model_transform = mult(model_transform, translation( -5, 0, 0 ));
+        shapes_in_use.planet1.draw(graphics_state, model_transform, purplePlastic);
+        model_transform = stack.pop();
+
+        stack.push(model_transform);
+        model_transform = mult(model_transform, translation( -9, 0, 0 ));
+        shapes_in_use.planet2.draw(graphics_state, model_transform, purplePlastic);
+        model_transform = stack.pop();
+
+        stack.push(model_transform);
+        model_transform = mult(model_transform, translation( -15, 0, 0 ));
+        shapes_in_use.planet3.draw(graphics_state, model_transform, purplePlastic);
+        model_transform = stack.pop();
+
+        stack.push(model_transform);
+        model_transform = mult(model_transform, translation( -23, 0, 0));
+        shapes_in_use.planet4.draw(graphics_state, model_transform, purplePlastic);
+        model_transform = stack.pop();
 
       }
   }, Animation );
