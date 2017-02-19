@@ -154,7 +154,7 @@ Declare_Any_Class( "Example_Animation",  // An example of a displayable object t
         graphics_state.lights = [];                    // First clear the light list each frame so we can replace & update lights.
 
         var t = graphics_state.animation_time/1000, light_orbit = [ Math.cos(t), Math.sin(t) ];
-        graphics_state.lights.push( new Light( vec4(10, 0, 0, 1), Color(1, 0, 0, 0), 10000 ));
+        graphics_state.lights.push( new Light( vec4(10, 0, 0, 1), Color(.9, .9, .4, 0), 10000 ));
         // graphics_state.lights.push( new Light( vec4(  30*light_orbit[0],  30*light_orbit[1],  34*light_orbit[0], 1 ), Color( 0, .4, 0, 1 ), 100000 ) );
         // graphics_state.lights.push( new Light( vec4( -10*light_orbit[0], -20*light_orbit[1], -14*light_orbit[0], 0 ), Color( 1, 1, .3, 1 ), 100*Math.cos( t/10 ) ) );
 
@@ -162,7 +162,13 @@ Declare_Any_Class( "Example_Animation",  // An example of a displayable object t
         // 1st parameter:  Color (4 floats in RGBA format), 2nd: Ambient light, 3rd: Diffuse reflectivity, 4th: Specular reflectivity, 5th: Smoothness exponent, 6th: Texture image.
         var purplePlastic = new Material( Color( .9,.5,.9,1 ), .4, .4, .8, 40 ), // Omit the final (string) parameter if you want no texture
               greyPlastic = new Material( Color( .5,.5,.5,1 ), .4, .8, .4, 20 ),
-              placeHolder = new Material( Color(0,0,0,0), 0,0,0,0, "Blank" );
+              placeHolder = new Material( Color(0,0,0,0), 0,0,0,0, "Blank" ),
+              bluegreen = new Material( Color(0, 0.8, 0.8, 1), .4, .4, .8, 40),
+              icygray = new Material( Color(.75, .76, .77, 1), .4, .4, .8, 40),
+              yellow = new Material( Color(.9,.9,.4,1), 1, 1, 1, 40),
+              clearblue = new Material( Color(.58,.8,.9,1),.8,.8,.8,40),
+              muddy = new Material( Color(.8,.4,0,1), .6,.6,.8,40),
+              moon = new Material( Color(.75,.75,.75,1),.4,.4,.8,40);
 
         /**********************************
         Start coding down here!!!!
@@ -171,30 +177,30 @@ Declare_Any_Class( "Example_Animation",  // An example of a displayable object t
         var stack = [];
 
         model_transform = mult( model_transform, translation( 10, 0, 0 ) );
-        shapes_in_use.sun.draw( graphics_state, model_transform, purplePlastic );
+        shapes_in_use.sun.draw( graphics_state, model_transform, yellow );
         stack.push(model_transform);
 
         model_transform = mult(model_transform, rotation(.1 * graphics_state.animation_time, 0, 1, 0));
         model_transform = mult(model_transform, translation( -5, 0, 0 ));
-        shapes_in_use.planet1.draw(graphics_state, model_transform, purplePlastic);
+        shapes_in_use.planet1.draw(graphics_state, model_transform, icygray);
         model_transform = stack.pop();
 
         stack.push(model_transform);
         model_transform = mult(model_transform, rotation(.3 * graphics_state.animation_time, 0, 1, 0))
         model_transform = mult(model_transform, translation( -9, 0, 0 ));
-        shapes_in_use.planet2.draw(graphics_state, model_transform, purplePlastic);
+        shapes_in_use.planet2.draw(graphics_state, model_transform, bluegreen);
         model_transform = stack.pop();
 
         stack.push(model_transform);
         model_transform = mult(model_transform, rotation(.35 * graphics_state.animation_time, 0, 1, 0))
         model_transform = mult(model_transform, translation( -15, 0, 0 ));
-        shapes_in_use.planet3.draw(graphics_state, model_transform, purplePlastic);
+        shapes_in_use.planet3.draw(graphics_state, model_transform, clearblue);
         model_transform = stack.pop();
 
         stack.push(model_transform);
         model_transform = mult(model_transform, rotation(.05 * graphics_state.animation_time, 0, 1, 0))
         model_transform = mult(model_transform, translation( -23, 0, 0));
-        shapes_in_use.planet4.draw(graphics_state, model_transform, purplePlastic);
+        shapes_in_use.planet4.draw(graphics_state, model_transform, muddy);
         model_transform = stack.pop();
 
       }
