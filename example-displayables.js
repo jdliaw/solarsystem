@@ -3,6 +3,7 @@
 // event and how to react to key and mouse input events.  Make one or two of your own subclasses, and fill them in with all your shape drawing calls and any extra key / mouse controls.
 
 // Now go down to Example_Animation's display() function to see where the sample shapes you see drawn are coded, and a good place to begin filling in your own code.
+var N = 1;
 
 Declare_Any_Class( "Debug_Screen",  // Debug_Screen - An example of a displayable object that our class Canvas_Manager can manage.  Displays a text user interface.
   { 'construct': function( context )
@@ -51,10 +52,10 @@ Declare_Any_Class( "Debug_Screen",  // Debug_Screen - An example of a displayabl
 Declare_Any_Class( "Example_Camera",     // An example of a displayable object that our class Canvas_Manager can manage.  Adds both first-person and
   { 'construct': function( context )     // third-person style camera matrix controls to the canvas.
       { // 1st parameter below is our starting camera matrix.  2nd is the projection:  The matrix that determines how depth is treated.  It projects 3D points onto a plane.
-        context.shared_scratchpad.graphics_state = new Graphics_State( translation(0, 0,-25), perspective(45, canvas.width/canvas.height, .1, 1000), 0 );
+        context.shared_scratchpad.graphics_state = new Graphics_State( translation(0, 0, 0), perspective(45, canvas.width/canvas.height, .1, 1000), 0 );
         this.define_data_members( { graphics_state: context.shared_scratchpad.graphics_state, thrust: vec3(), origin: vec3( 0, 5, 0 ), looking: false } );
 
-        this.graphics_state.camera_transform = mult(translation(-7, -3, -20), this.graphics_state.camera_transform);
+        this.graphics_state.camera_transform = mult(translation(-7, -3, -60), this.graphics_state.camera_transform);
         // *** Mouse controls: ***
         this.mouse = { "from_center": vec2() };
         var mouse_position = function( e ) { return vec2( e.clientX - canvas.width/2, e.clientY - canvas.height/2 ); };   // Measure mouse steering, for rotating the flyaround camera.
@@ -64,17 +65,55 @@ Declare_Any_Class( "Example_Camera",     // An example of a displayable object t
         canvas.addEventListener( "mouseout",  ( function(self) { return function(e) { self.mouse.from_center = vec2(); }; } ) (this), false );    // Stop steering if the mouse leaves the canvas.
       },
     'init_keys': function( controls )   // init_keys():  Define any extra keyboard shortcuts here
-      { controls.add( "Space", this, function() { this.thrust[1] = -1; } );     controls.add( "Space", this, function() { this.thrust[1] =  0; }, {'type':'keyup'} );
+      {
         controls.add( "z",     this, function() { this.thrust[1] =  1; } );     controls.add( "z",     this, function() { this.thrust[1] =  0; }, {'type':'keyup'} );
-        controls.add( "w",     this, function() { this.thrust[2] =  1; } );     controls.add( "w",     this, function() { this.thrust[2] =  0; }, {'type':'keyup'} );
+        controls.add( "Space",     this, function() { this.thrust[2] =  N; } );
+        controls.add( "Space",     this, function() { this.thrust[2] =  0; }, {'type':'keyup'} );
+        // m = backwards
+        controls.add( "m",     this, function() { this.thrust[2] =  -N; } );
+        controls.add( "m",     this, function() { this.thrust[2] =  0; }, {'type':'keyup'} );
+        controls.add(",", this, function() { // comma = left
+          this.thrust[0] = N;
+        });
+        controls.add(",", this, function() {
+          this.thrust[0] = 0;
+        }, {'type':'keyup'});
+        controls.add(".", this, function() { // period = right
+          this.thrust[0] = -N;
+        });
+        controls.add(".", this, function() {
+          this.thrust[0] = 0;
+        }, {'type':'keyup'});
         controls.add( "a",     this, function() { this.thrust[0] =  1; } );     controls.add( "a",     this, function() { this.thrust[0] =  0; }, {'type':'keyup'} );
         controls.add( "s",     this, function() { this.thrust[2] = -1; } );     controls.add( "s",     this, function() { this.thrust[2] =  0; }, {'type':'keyup'} );
         controls.add( "d",     this, function() { this.thrust[0] = -1; } );     controls.add( "d",     this, function() { this.thrust[0] =  0; }, {'type':'keyup'} );
         controls.add( "f",     this, function() { this.looking  ^=  1; } );
-        controls.add( ",",     this, function() { this.graphics_state.camera_transform = mult( rotation( 6, 0, 0,  1 ), this.graphics_state.camera_transform ); } );
-        controls.add( ".",     this, function() { this.graphics_state.camera_transform = mult( rotation( 6, 0, 0, -1 ), this.graphics_state.camera_transform ); } );
+        controls.add( "up",     this, function() {
+          this.graphics_state.camera_transform = mult( rotation( N, -1, 0,  0 ), this.graphics_state.camera_transform );
+        } );
+        controls.add( "down",     this, function() {
+          this.graphics_state.camera_transform = mult( rotation( N, 1, 0, 0 ), this.graphics_state.camera_transform );
+        } );
+        controls.add( "left", this, function() {
+          this.graphics_state.camera_transform = mult(rotation(N, 0, -1, 0), this.graphics_state.camera_transform);
+        });
+        controls.add("right", this, function() {
+          this.graphics_state.camera_transform = mult(rotation(N, 0, 1, 0), this.graphics_state.camera_transform);
+        });
         controls.add( "o",     this, function() { this.origin = mult_vec( inverse( this.graphics_state.camera_transform ), vec4(0,0,0,1) ).slice(0,3)         ; } );
-        controls.add( "r",     this, function() { this.graphics_state.camera_transform = mat4()                                                               ; } );
+        controls.add( "r",     this, function() {
+          this.graphics_state.camera_transform = mat4();
+          this.graphics_state.camera_transform = mult(translation(-7, -3, -60), this.graphics_state.camera_transform);
+        });
+        controls.add("1", this, function () { N = 1; });
+        controls.add("2", this, function () { N = 2; });
+        controls.add("3", this, function () { N = 3; });
+        controls.add("4", this, function () { N = 4; });
+        controls.add("5", this, function () { N = 5; });
+        controls.add("6", this, function () { N = 6; });
+        controls.add("7", this, function () { N = 7; });
+        controls.add("8", this, function () { N = 8; });
+        controls.add("9", this, function () { N = 9; });
       },
     'update_strings': function( user_interface_string_manager )       // Strings that this displayable object (Animation) contributes to the UI:
       { var C_inv = inverse( this.graphics_state.camera_transform ), pos = mult_vec( C_inv, vec4( 0, 0, 0, 1 ) ),
@@ -112,7 +151,7 @@ Declare_Any_Class( "Example_Camera",     // An example of a displayable object t
 Declare_Any_Class( "Example_Animation",  // An example of a displayable object that our class Canvas_Manager can manage.  This one draws the scene's 3D shapes.
   { 'construct': function( context )
       { this.shared_scratchpad    = context.shared_scratchpad;
-
+        this.shared_scratchpad.animate ^= 1;
         // shapes_in_use.triangle        = new Triangle();                  // At the beginning of our program, instantiate all shapes we plan to use,
         // shapes_in_use.strip           = new Square();                   // each with only one instance in the graphics card's memory.
         // shapes_in_use.bad_tetrahedron = new Tetrahedron( false );      // For example we'll only create one "cube" blueprint in the GPU, but we'll re-use
@@ -136,7 +175,7 @@ Declare_Any_Class( "Example_Animation",  // An example of a displayable object t
       {
         controls.add( "ALT+g", this, function() { this.shared_scratchpad.graphics_state.gouraud       ^= 1; } );   // Make the keyboard toggle some
         controls.add( "ALT+n", this, function() { this.shared_scratchpad.graphics_state.color_normals ^= 1; } );   // GPU flags on and off.
-        controls.add( "ALT+a", this, function() { this.shared_scratchpad.animate                      ^= 1; } );
+        // controls.add( "ALT+a", this, function() { this.shared_scratchpad.animate                      ^= 1; } );
       },
     'update_strings': function( user_interface_string_manager )       // Strings that this displayable object (Animation) contributes to the UI:
       {
@@ -197,10 +236,8 @@ Declare_Any_Class( "Example_Animation",  // An example of a displayable object t
         model_transform = mult(model_transform, rotation(.05 * graphics_state.animation_time, 0, 1, 0))
         model_transform = mult(model_transform, translation( -15, 0, 0 ));
         shapes_in_use.planet3.draw(graphics_state, model_transform, clearblue);
-        // model_transform = stack.pop();
-
-        // stack.push(model_transform);
-        model_transform = mult(model_transform, rotation(.2 * graphics_state.animation_time, 0, 1, 0))
+        // don't pop yet bc want moon to rotate around this planet (transform wrt planet3)
+        model_transform = mult(model_transform, rotation(.2 * graphics_state.animation_time, 0, 1, 0));
         model_transform = mult(model_transform, translation( -3, 0, 0));
         shapes_in_use.moon.draw(graphics_state, model_transform, moon);
         model_transform = stack.pop();
