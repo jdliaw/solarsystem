@@ -54,6 +54,7 @@ Declare_Any_Class( "Example_Camera",     // An example of a displayable object t
         context.shared_scratchpad.graphics_state = new Graphics_State( translation(0, 0,-25), perspective(45, canvas.width/canvas.height, .1, 1000), 0 );
         this.define_data_members( { graphics_state: context.shared_scratchpad.graphics_state, thrust: vec3(), origin: vec3( 0, 5, 0 ), looking: false } );
 
+        this.graphics_state.camera_transform = mult(translation(-7, -3, -20), this.graphics_state.camera_transform);
         // *** Mouse controls: ***
         this.mouse = { "from_center": vec2() };
         var mouse_position = function( e ) { return vec2( e.clientX - canvas.width/2, e.clientY - canvas.height/2 ); };   // Measure mouse steering, for rotating the flyaround camera.
@@ -173,21 +174,25 @@ Declare_Any_Class( "Example_Animation",  // An example of a displayable object t
         shapes_in_use.sun.draw( graphics_state, model_transform, purplePlastic );
         stack.push(model_transform);
 
+        model_transform = mult(model_transform, rotation(.1 * graphics_state.animation_time, 0, 1, 0));
         model_transform = mult(model_transform, translation( -5, 0, 0 ));
         shapes_in_use.planet1.draw(graphics_state, model_transform, purplePlastic);
         model_transform = stack.pop();
 
         stack.push(model_transform);
+        model_transform = mult(model_transform, rotation(.3 * graphics_state.animation_time, 0, 1, 0))
         model_transform = mult(model_transform, translation( -9, 0, 0 ));
         shapes_in_use.planet2.draw(graphics_state, model_transform, purplePlastic);
         model_transform = stack.pop();
 
         stack.push(model_transform);
+        model_transform = mult(model_transform, rotation(.35 * graphics_state.animation_time, 0, 1, 0))
         model_transform = mult(model_transform, translation( -15, 0, 0 ));
         shapes_in_use.planet3.draw(graphics_state, model_transform, purplePlastic);
         model_transform = stack.pop();
 
         stack.push(model_transform);
+        model_transform = mult(model_transform, rotation(.05 * graphics_state.animation_time, 0, 1, 0))
         model_transform = mult(model_transform, translation( -23, 0, 0));
         shapes_in_use.planet4.draw(graphics_state, model_transform, purplePlastic);
         model_transform = stack.pop();
