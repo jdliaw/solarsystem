@@ -7,6 +7,8 @@ var N = 1;
 var attach = false;
 var oldpos;
 var oldN;
+var LR_rotation = 0;
+var UD_rotation = 0;
 
 Declare_Any_Class( "Debug_Screen",  // Debug_Screen - An example of a displayable object that our class Canvas_Manager can manage.  Displays a text user interface.
   { 'construct': function( context )
@@ -94,7 +96,7 @@ Declare_Any_Class( "Example_Camera",     // An example of a displayable object t
           if (attach == false) {
             oldpos = this.graphics_state.camera_transform;
             oldN = N;
-            N = 0;
+            // N = 0;
           }
           attach = true;
         });
@@ -108,15 +110,27 @@ Declare_Any_Class( "Example_Camera",     // An example of a displayable object t
         } );
         controls.add( "up",     this, function() {
           this.graphics_state.camera_transform = mult( rotation( N, -1, 0,  0 ), this.graphics_state.camera_transform );
+          if (attach) {
+            UD_rotation += N;
+          }
         } );
         controls.add( "down",     this, function() {
           this.graphics_state.camera_transform = mult( rotation( N, 1, 0, 0 ), this.graphics_state.camera_transform );
+          if (attach) {
+            UD_rotation -= N;
+          }
         } );
         controls.add( "left", this, function() {
           this.graphics_state.camera_transform = mult(rotation(N, 0, -1, 0), this.graphics_state.camera_transform);
+          if (attach) {
+            LR_rotation += N;
+          }
         });
         controls.add("right", this, function() {
           this.graphics_state.camera_transform = mult(rotation(N, 0, 1, 0), this.graphics_state.camera_transform);
+          if (attach) {
+            LR_rotation -= N;
+          }
         });
         // controls.add( "o",     this, function() { this.origin = mult_vec( inverse( this.graphics_state.camera_transform ), vec4(0,0,0,1) ).slice(0,3)         ; } );
         controls.add( "r",     this, function() {
@@ -250,6 +264,10 @@ Declare_Any_Class( "Example_Animation",  // An example of a displayable object t
         this.shared_scratchpad.graphics_state.gouraud ^= 1;
         if (attach) {
           model_transform = mult(model_transform, translation(-3, 0, 0));
+          model_transform = mult(model_transform, rotation(270, 0, 1, 0));
+          model_transform = mult(model_transform, rotation(-10, 1, 0, 0));
+          model_transform = mult(model_transform, rotation(UD_rotation, 1, 0, 0));
+          model_transform = mult(model_transform, rotation(LR_rotation, 0, 1, 0));
           this.shared_scratchpad.graphics_state.camera_transform = inverse(model_transform);
         }
         model_transform = stack.pop();
