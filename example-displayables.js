@@ -4,6 +4,9 @@
 
 // Now go down to Example_Animation's display() function to see where the sample shapes you see drawn are coded, and a good place to begin filling in your own code.
 var N = 1;
+var attach = false;
+var oldpos;
+var oldN;
 
 Declare_Any_Class( "Debug_Screen",  // Debug_Screen - An example of a displayable object that our class Canvas_Manager can manage.  Displays a text user interface.
   { 'construct': function( context )
@@ -66,28 +69,43 @@ Declare_Any_Class( "Example_Camera",     // An example of a displayable object t
       },
     'init_keys': function( controls )   // init_keys():  Define any extra keyboard shortcuts here
       {
-        controls.add( "z",     this, function() { this.thrust[1] =  1; } );     controls.add( "z",     this, function() { this.thrust[1] =  0; }, {'type':'keyup'} );
+        // controls.add( "z",     this, function() { this.thrust[1] =  1; } );     controls.add( "z",     this, function() { this.thrust[1] =  0; }, {'type':'keyup'} );
         controls.add( "Space",     this, function() { this.thrust[2] =  N; } );
         controls.add( "Space",     this, function() { this.thrust[2] =  0; }, {'type':'keyup'} );
         // m = backwards
         controls.add( "m",     this, function() { this.thrust[2] =  -N; } );
         controls.add( "m",     this, function() { this.thrust[2] =  0; }, {'type':'keyup'} );
-        controls.add(",", this, function() { // comma = left
+        // comma = left
+        controls.add(",", this, function() {
           this.thrust[0] = N;
         });
         controls.add(",", this, function() {
           this.thrust[0] = 0;
         }, {'type':'keyup'});
-        controls.add(".", this, function() { // period = right
+        // period = right
+        controls.add(".", this, function() {
           this.thrust[0] = -N;
         });
         controls.add(".", this, function() {
           this.thrust[0] = 0;
         }, {'type':'keyup'});
-        controls.add( "a",     this, function() { this.thrust[0] =  1; } );     controls.add( "a",     this, function() { this.thrust[0] =  0; }, {'type':'keyup'} );
-        controls.add( "s",     this, function() { this.thrust[2] = -1; } );     controls.add( "s",     this, function() { this.thrust[2] =  0; }, {'type':'keyup'} );
-        controls.add( "d",     this, function() { this.thrust[0] = -1; } );     controls.add( "d",     this, function() { this.thrust[0] =  0; }, {'type':'keyup'} );
-        controls.add( "f",     this, function() { this.looking  ^=  1; } );
+        // attach
+        controls.add( "a", this, function() {
+          if (attach == false) {
+            oldpos = this.graphics_state.camera_transform;
+            oldN = N;
+            N = 0;
+          }
+          attach = true;
+        });
+        // detach
+        controls.add( "d", this, function() {
+          attach = false;
+          if (oldpos) {
+            this.graphics_state.camera_transform = oldpos;
+          }
+          N = oldN;
+        } );
         controls.add( "up",     this, function() {
           this.graphics_state.camera_transform = mult( rotation( N, -1, 0,  0 ), this.graphics_state.camera_transform );
         } );
@@ -100,7 +118,7 @@ Declare_Any_Class( "Example_Camera",     // An example of a displayable object t
         controls.add("right", this, function() {
           this.graphics_state.camera_transform = mult(rotation(N, 0, 1, 0), this.graphics_state.camera_transform);
         });
-        controls.add( "o",     this, function() { this.origin = mult_vec( inverse( this.graphics_state.camera_transform ), vec4(0,0,0,1) ).slice(0,3)         ; } );
+        // controls.add( "o",     this, function() { this.origin = mult_vec( inverse( this.graphics_state.camera_transform ), vec4(0,0,0,1) ).slice(0,3)         ; } );
         controls.add( "r",     this, function() {
           this.graphics_state.camera_transform = mat4();
           this.graphics_state.camera_transform = mult(translation(-7, -3, -60), this.graphics_state.camera_transform);
@@ -230,6 +248,10 @@ Declare_Any_Class( "Example_Animation",  // An example of a displayable object t
         model_transform = mult(model_transform, translation( -9, 0, 0 ));
         shapes_in_use.planet2.draw(graphics_state, model_transform, bluegreen);
         this.shared_scratchpad.graphics_state.gouraud ^= 1;
+        if (attach) {
+          model_transform = mult(model_transform, translation(-3, 0, 0));
+          this.shared_scratchpad.graphics_state.camera_transform = inverse(model_transform);
+        }
         model_transform = stack.pop();
 
         stack.push(model_transform);
